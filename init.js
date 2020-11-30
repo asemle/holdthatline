@@ -220,9 +220,20 @@ function checkAllPointsTaken(point) {
     // filter out points that are out of bounds
     surroundingPoints = surroundingPoints.filter(surrPoint => surrPoint.x >= 0 && surrPoint.x < 4 && surrPoint.y >= 0 && surrPoint.y < 4);
         
-    // if all surrounding points are plotted in lines arr, return true
-    return surroundingPoints.reduce((prev, surrPoint) => 
-    {return !lines.find(line => pointIsOnLine(surrPoint, line)) ? false : prev}, true)
+    
+    return surroundingPoints.reduce(function(prev, surrPoint) {
+        // check if all surrounding points are plotted in lines arr
+        if(!lines.find(line => pointIsOnLine(surrPoint, line, point))) {
+
+            // if not, check if potential line to unused point intersects any line
+            //returns true if all points are taken or potential lines intersects any line
+            return lines.reduce((prev, curr) => (intersects(point.x, point.y, surrPoint.x, surrPoint.y, curr.start.x, curr.start.y, curr.end.x, curr.end.y) ? true : prev), false) ? prev : false;
+           
+        } else {
+         return prev
+        }
+    }, true) 
+         
 }
 
 function pointIsOnLine(point, line) {
@@ -233,8 +244,9 @@ function pointIsOnLine(point, line) {
 // make sure point falls on segment
         return ((line.start.x <= point.x && point.x <= line.end.x && line.start.y <= point.y && point.y <= line.end.y) || line.end.x <= point.x && point.x <= line.start.x && line.end.y <= point.y && point.y <= line.start.y || line.end.x <= point.x && point.x <= line.start.x && line.start.y <= point.y && point.y <= line.end.y || line.start.x <= point.x && point.x <= line.end.x && line.end.y <= point.y && point.y <= line.start.y);       
     } else {
-        return false;
+         return false;
         
+
     }
 }
 
